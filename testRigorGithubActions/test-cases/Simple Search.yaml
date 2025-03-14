@@ -1,5 +1,0 @@
-customSteps: |
-  enter "testRigor"
-  enter enter
-  Check page contains 2nd "testRigor"
-labels: []
