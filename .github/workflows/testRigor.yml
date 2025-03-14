@@ -28,7 +28,15 @@ jobs:
                   -H 'auth-token: ac4f1ed1-3da1-4f1d-bfff-6f10af71a8b7' \
                   --data '{"forceCancelPreviousTesting":true,"storedValues":{"storedValueName1":"Value"}}' \
                   https://api.testrigor.com/api/v1/apps/JZW9ziTzGkZ2GSzkm/retest
+                --next -X POST \
+                  -H 'Content-type: application/json' \
+                  -H 'auth-token: 7fcfdd73-b01a-446a-949a-3fc90e7411a2' \
+                  --data '{"forceCancelPreviousTesting":true,"storedValues":{"storedValueName1":"Value"}}' \
                   https://api.testrigor.com/api/v1/apps/PybxPXCt4QxNSnZ3E/retest
+                --next -X POST \
+                  -H 'Content-type: application/json' \
+                  -H 'auth-token: 53fd83f4-d9f4-44f9-b8a8-490e86934ac5' \
+                  --data '{"forceCancelPreviousTesting":true,"storedValues":{"storedValueName1":"Value"}}' \
                   https://api.testrigor.com/api/v1/apps/joYxqWB3qEqwRtpTt/retest
                   
                 sleep 10
@@ -39,7 +47,9 @@ jobs:
                   echo "==================================="
                   echo " Checking TestRigor retest"
                   echo "==================================="
-                  response=$(curl -i -o - -s -X GET 'https://api.testrigor.com/api/v1/apps/JZW9ziTzGkZ2GSzkm/status', 'https://api.testrigor.com/api/v1/apps/PybxPXCt4QxNSnZ3E/retest', 'https://api.testrigor.com/api/v1/apps/joYxqWB3qEqwRtpTt/retest' -H 'auth-token: ac4f1ed1-3da1-4f1d-bfff-6f10af71a8b7' -H 'Accept: application/json')
+                  response=$(curl -i -o - -s -X GET 'https://api.testrigor.com/api/v1/apps/JZW9ziTzGkZ2GSzkm/status' -H 'auth-token: ac4f1ed1-3da1-4f1d-bfff-6f10af71a8b7' -H 'Accept: application/json')
+                  response=$(curl -i -o - -s -X GET 'https://api.testrigor.com/api/v1/apps/PybxPXCt4QxNSnZ3E/status' -H 'auth-token: 7fcfdd73-b01a-446a-949a-3fc90e7411a2' -H 'Accept: application/json')
+                  response=$(curl -i -o - -s -X GET 'https://api.testrigor.com/api/v1/apps/joYxqWB3qEqwRtpTt/status' -H 'auth-token: 53fd83f4-d9f4-44f9-b8a8-490e86934ac5' -H 'Accept: application/json')
                   code=$(echo "$response" | grep HTTP |  awk '{print $2}')
                   body=$(echo "$response" | sed -n '/{/,/}/p')
                   echo "Status code: " $code
