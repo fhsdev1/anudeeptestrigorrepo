@@ -1,6 +1,5 @@
-customSteps:
-  Enter “testRigor”
-  Enter enter
-  Check page contains "testRigor"
+customSteps: |
+  enter "testRigor"
+  enter enter
+  Check page contains 2nd "testRigor"
 labels: []
-disabled: false
