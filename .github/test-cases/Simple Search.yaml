@@ -1,1 +1,6 @@
-
+customSteps:
+  Enter “testRigor”
+  Enter enter
+  Check page contains "testRigor"
+labels: []
+disabled: false
