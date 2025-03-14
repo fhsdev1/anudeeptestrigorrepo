@@ -5,8 +5,8 @@ name: testRigor
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
-  # push:
-  #  branches: [ "Prod" ]
+  push:
+    branches: [ "Prod" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -26,9 +26,11 @@ jobs:
                 curl -X POST \
                   -H 'Content-type: application/json' \
                   -H 'auth-token: ac4f1ed1-3da1-4f1d-bfff-6f10af71a8b7' \
-                 --data '{ "branch": { "name": "Prod"}, "storedValues": { "storedValueName1": "Value" }, "forceCancelPreviousTesting":true }' \
+                  --data '{"forceCancelPreviousTesting":true,"storedValues":{"storedValueName1":"Value"}}' \
                   https://api.testrigor.com/api/v1/apps/JZW9ziTzGkZ2GSzkm/retest
-
+                  https://api.testrigor.com/api/v1/apps/PybxPXCt4QxNSnZ3E/retest
+                  https://api.testrigor.com/api/v1/apps/joYxqWB3qEqwRtpTt/retest
+                  
                 sleep 10
 
                 while true
@@ -37,7 +39,7 @@ jobs:
                   echo "==================================="
                   echo " Checking TestRigor retest"
                   echo "==================================="
-                  response=$(curl -i -o - -s -X GET 'https://api.testrigor.com/api/v1/apps/JZW9ziTzGkZ2GSzkm/status' -H 'auth-token: ac4f1ed1-3da1-4f1d-bfff-6f10af71a8b7' -H 'Accept: application/json')
+                  response=$(curl -i -o - -s -X GET 'https://api.testrigor.com/api/v1/apps/JZW9ziTzGkZ2GSzkm/status', 'https://api.testrigor.com/api/v1/apps/PybxPXCt4QxNSnZ3E/retest', 'https://api.testrigor.com/api/v1/apps/joYxqWB3qEqwRtpTt/retest' -H 'auth-token: ac4f1ed1-3da1-4f1d-bfff-6f10af71a8b7' -H 'Accept: application/json')
                   code=$(echo "$response" | grep HTTP |  awk '{print $2}')
                   body=$(echo "$response" | sed -n '/{/,/}/p')
                   echo "Status code: " $code
