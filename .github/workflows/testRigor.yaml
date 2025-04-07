@@ -74,7 +74,7 @@ jobs:
 
                           # Debugging output for full response and code
                           echo "Full response: $response"
-                          echo "Extracted Status code: $code"
+                          echo "Extracted Status code: '$code'"  # Quote to show if there are any extra spaces or characters
                           echo "Response body: $body"
                           
                           echo $code
@@ -92,7 +92,7 @@ jobs:
                           code=$(check_status $app_id $auth_token)
 
                           # Handle the status code
-                          echo "Handling status code: $code"  # Debug: show the code before case matching
+                          echo "Handling status code: '$code'"  # Show the code with quotes for debugging
 
                           case $code in
                             4*|5*)
@@ -129,6 +129,7 @@ jobs:
                         # Sleep for 10 seconds before checking again
                         sleep 10
                       done
+
 
 
 
