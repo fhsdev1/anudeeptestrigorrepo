@@ -50,83 +50,83 @@ jobs:
                 sleep 10
 
                 while true
-                  do
-                    echo " "
-                    echo "==================================="
-                    echo " Checking TestRigor retest"
-                    echo "==================================="
+                        do
+                          echo " "
+                          echo "==================================="
+                          echo " Checking TestRigor retest"
+                          echo "==================================="
 
-                    # Function to check API status with added debug info
-                    check_status() {
-                      app_id=$1
-                      auth_token=$2
-                      response=$(curl -i -s -X GET "https://api.testrigor.com/api/v1/apps/$app_id/status" -H "auth-token: $auth_token" -H 'Accept: application/json')
-                      
-                      # If curl fails (non-zero exit status), exit with error
-                      if [ $? -ne 0 ]; then
-                        echo "Curl command failed"
-                        exit 1
-                      fi
+                          # Function to check API status with added debug info
+                          check_status() {
+                            app_id=$1
+                            auth_token=$2
+                            response=$(curl -i -s -X GET "https://api.testrigor.com/api/v1/apps/$app_id/status" -H "auth-token: $auth_token" -H 'Accept: application/json')
+                            
+                            # If curl fails (non-zero exit status), exit with error
+                            if [ $? -ne 0 ]; then
+                              echo "Curl command failed"
+                              exit 1
+                            fi
 
-                      echo "Full response: $response"  # This will print both headers and body for debugging
-                      
-                      # Extract HTTP status code and body
-                      code=$(echo "$response" | grep HTTP | awk '{print $2}')
-                      body=$(echo "$response" | sed -n '/{/,/}/p')
-                      
-                      echo "Status code: $code"
-                      echo "Response: $body"
-                      
-                      echo $code
-                    }
+                            # Extract HTTP status code and body
+                            code=$(echo "$response" | grep HTTP | awk '{print $2}' | tr -d '[:space:]')  # Remove spaces
+                            body=$(echo "$response" | sed -n '/{/,/}/p')
+                            
+                            echo "Full response: $response"  # This will print both headers and body for debugging
+                            echo "Status code: $code"
+                            echo "Response body: $body"
+                            
+                            echo $code
+                          }
 
-                    # Test apps info (you can change these if needed)
-                    apps=("JZW9ziTzGkZ2GSzkm:ac4f1ed1-3da1-4f1d-bfff-6f10af71a8b7" "PybxPXCt4QxNSnZ3E:7fcfdd73-b01a-446a-949a-3fc90e7411a2" "joYxqWB3qEqwRtpTt:53fd83f4-d9f4-44f9-b8a8-490e86934ac5")
+                          # Test apps info (you can change these if needed)
+                          apps=("JZW9ziTzGkZ2GSzkm:ac4f1ed1-3da1-4f1d-bfff-6f10af71a8b7" "PybxPXCt4QxNSnZ3E:7fcfdd73-b01a-446a-949a-3fc90e7411a2" "joYxqWB3qEqwRtpTt:53fd83f4-d9f4-44f9-b8a8-490e86934ac5")
 
-                    # Loop through each app and check status
-                    for app in "${apps[@]}"; do
-                      app_id=$(echo $app | cut -d ':' -f 1)
-                      auth_token=$(echo $app | cut -d ':' -f 2)
-                      
-                      # Call function to get status
-                      code=$(check_status $app_id $auth_token)
+                          # Loop through each app and check status
+                          for app in "${apps[@]}"; do
+                            app_id=$(echo $app | cut -d ':' -f 1)
+                            auth_token=$(echo $app | cut -d ':' -f 2)
+                            
+                            # Call function to get status
+                            code=$(check_status $app_id $auth_token)
 
-                      # Handle the status code
-                      case $code in
-                        4*|5*)
-                          # 400 or 500 errors
-                          echo "Error calling API (HTTP $code)"
-                          exit 1
-                          ;;
-                        200)
-                          # 200: successfully finished
-                          echo "Test finished successfully"
-                          exit 0
-                          ;;
-                        227)
-                          # 227: New (test not yet started or still waiting)
-                          echo "Test is new, not started yet"
-                          ;;
-                        228)
-                          # 228: In progress
-                          echo "Test is in progress"
-                          ;;
-                        230)
-                          # 230: Failed
-                          echo "Test finished but failed"
-                          exit 1
-                          ;;
-                        *)
-                          # Catch all for any unknown or unexpected status codes
-                          echo "Unknown status code: $code"
-                          exit 1
-                          ;;
-                      esac
-                    done
-                    
-                    # Sleep for 10 seconds before checking again
-                    sleep 10
-                  done
+                            # Handle the status code
+                            case $code in
+                              4*|5*)
+                                # 400 or 500 errors
+                                echo "Error calling API (HTTP $code)"
+                                exit 1
+                                ;;
+                              200)
+                                # 200: successfully finished
+                                echo "Test finished successfully"
+                                exit 0
+                                ;;
+                              227)
+                                # 227: New (test not yet started or still waiting)
+                                echo "Test is new, not started yet"
+                                ;;
+                              228)
+                                # 228: In progress
+                                echo "Test is in progress"
+                                ;;
+                              230)
+                                # 230: Failed
+                                echo "Test finished but failed"
+                                exit 1
+                                ;;
+                              *)
+                                # Catch all for any unknown or unexpected status codes
+                                echo "Unknown status code: $code"
+                                exit 1
+                                ;;
+                            esac
+                          done
+                          
+                          # Sleep for 10 seconds before checking again
+                          sleep 10
+                        done
+
 
 
 
