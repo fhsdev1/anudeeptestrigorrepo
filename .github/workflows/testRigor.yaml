@@ -2,77 +2,142 @@ name: testRigor
 
 on:
   push:
-    branches: ["Prod"]
+    branches: [ "Prod" ]
   workflow_dispatch:
 
 jobs:
-  build:
+  test_sequence:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Run a multi-line script
+      - name: Run Firehouse Digital - Rewards Testing
         run: |
-          # Function to check the test status and wait for completion
-          check_test_status() {
-            local test_id=$1
-            local auth_token=$2
-            local max_retries=30
-            local retries=0
-            local response code body
-
-            while [ $retries -lt $max_retries ]
-            do
-              echo "Checking status for test ID: $test_id"
-              response=$(curl -i -o - -s -X GET "https://api.testrigor.com/api/v1/apps/$test_id/status" -H "auth-token: $auth_token" -H 'Accept: application/json')
-              code=$(echo "$response" | grep HTTP | awk '{print $2}')
-              body=$(echo "$response" | sed -n '/{/,/}/p')
-
-              echo "Status code: $code"
-              echo "Response: $body"
-
-              case $code in
-                4*|5*)
-                  echo "Error calling API for $test_id"
-                  exit 1
-                  ;;
-                200)
-                  echo "Test $test_id finished successfully"
-                  exit 0
-                  ;;
-                227|228)
-                  echo "Test $test_id is not finished yet. Retrying..."
-                  retries=$((retries + 1))
-                  sleep 10
-                  ;;
-                230)
-                  echo "Test $test_id finished but failed"
-                  exit 1
-                  ;;
-                *)
-                  echo "Unknown status for test $test_id"
-                  exit 1
-                  ;;
-              esac
-            done
-
-            echo "Test $test_id did not complete in the expected time"
-            exit 1
-          }
-
-          # Trigger and check the first test
           echo "Firehouse Digital - Rewards Testing"
-          curl -X POST -H 'Content-type: application/json' -H 'auth-token: ac4f1ed1-3da1-4f1d-bfff-6f10af71a8b7' --data '{"forceCancelPreviousTesting":true,"storedValues":{"storedValueName1":"Value"}}' https://api.testrigor.com/api/v1/apps/JZW9ziTzGkZ2GSzkm/retest
+          curl -X POST \
+            -H 'Content-type: application/json' \
+            -H 'auth-token: ac4f1ed1-3da1-4f1d-bfff-6f10af71a8b7' \
+            --data '{"forceCancelPreviousTesting":true,"storedValues":{"storedValueName1":"Value"}}' \
+            https://api.testrigor.com/api/v1/apps/JZW9ziTzGkZ2GSzkm/retest
           sleep 10
-          check_test_status "JZW9ziTzGkZ2GSzkm" "ac4f1ed1-3da1-4f1d-bfff-6f10af71a8b7"
 
-          # Trigger and check the second test
+          while true
+          do
+            echo "==================================="
+            echo " Checking TestRigor retest"
+            echo "==================================="
+            response=$(curl -i -o - -s -X GET 'https://api.testrigor.com/api/v1/apps/JZW9ziTzGkZ2GSzkm/status' -H 'auth-token: ac4f1ed1-3da1-4f1d-bfff-6f10af71a8b7' -H 'Accept: application/json')
+            code=$(echo "$response" | grep HTTP | awk '{print $2}')
+            body=$(echo "$response" | sed -n '/{/,/}/p')
+            echo "Status code: " $code
+            echo "Response: " $body
+            case $code in
+              4*|5*) # 400 or 500 errors
+                echo "Error calling API"
+                exit 1
+                ;;
+              200) # 200: successfully finished
+                echo "Test finished successfully"
+                break
+                ;;
+              227|228) # 227: New - 228: In progress
+                echo "Test is not finished yet"
+                ;;
+              230) # 230: Failed
+                echo "Test finished but failed"
+                exit 1
+                ;;
+              *) # Any other status code
+                echo "Unknown status"
+                exit 1
+                ;;
+            esac
+            sleep 10
+          done
+
+      - name: Run Firehouse Digital - Github Integration
+        run: |
           echo "Firehouse Digital - Github Integration"
-          curl -X POST -H 'Content-type: application/json' -H 'auth-token: 7fcfdd73-b01a-446a-949a-3fc90e7411a2' --data '{"forceCancelPreviousTesting":true,"storedValues":{"storedValueName1":"Value"}}' https://api.testrigor.com/api/v1/apps/PybxPXCt4QxNSnZ3E/retest
+          curl -X POST \
+            -H 'Content-type: application/json' \
+            -H 'auth-token: 7fcfdd73-b01a-446a-949a-3fc90e7411a2' \
+            --data '{"forceCancelPreviousTesting":true,"storedValues":{"storedValueName1":"Value"}}' \
+            https://api.testrigor.com/api/v1/apps/PybxPXCt4QxNSnZ3E/retest
           sleep 10
-          check_test_status "PybxPXCt4QxNSnZ3E" "7fcfdd73-b01a-446a-949a-3fc90e7411a2"
 
-          # Trigger and check the third test
+          while true
+          do
+            echo "==================================="
+            echo " Checking TestRigor retest"
+            echo "==================================="
+            response=$(curl -i -o - -s -X GET 'https://api.testrigor.com/api/v1/apps/PybxPXCt4QxNSnZ3E/status' -H 'auth-token: 7fcfdd73-b01a-446a-949a-3fc90e7411a2' -H 'Accept: application/json')
+            code=$(echo "$response" | grep HTTP | awk '{print $2}')
+            body=$(echo "$response" | sed -n '/{/,/}/p')
+            echo "Status code: " $code
+            echo "Response: " $body
+            case $code in
+              4*|5*) # 400 or 500 errors
+                echo "Error calling API"
+                exit 1
+                ;;
+              200) # 200: successfully finished
+                echo "Test finished successfully"
+                break
+                ;;
+              227|228) # 227: New - 228: In progress
+                echo "Test is not finished yet"
+                ;;
+              230) # 230: Failed
+                echo "Test finished but failed"
+                exit 1
+                ;;
+              *) # Any other status code
+                echo "Unknown status"
+                exit 1
+                ;;
+            esac
+            sleep 10
+          done
+
+      - name: Run Toast Menu Testing-POC
+        run: |
           echo "Toast Menu Testing-POC"
-          curl -X POST -H 'Content-type: application/json' -H 'auth-token: 53fd83f4-d9f4-44f9-b8a8-490e86934ac5' --data '{"forceCancelPreviousTesting":true,"storedValues":{"storedValueName1":"Value"}}' https://api.testrigor.com/api/v1/apps/joYxqWB3qEqwRtpTt/retest
+          curl -X POST \
+            -H 'Content-type: application/json' \
+            -H 'auth-token: 53fd83f4-d9f4-44f9-b8a8-490e86934ac5' \
+            --data '{"forceCancelPreviousTesting":true,"storedValues":{"storedValueName1":"Value"}}' \
+            https://api.testrigor.com/api/v1/apps/joYxqWB3qEqwRtpTt/retest
           sleep 10
-          check_test_status "joYxqWB3qEqwRtpTt" "53fd83f4-d9f4-44f9-b8a8-490e86934ac5"
+
+          while true
+          do
+            echo "==================================="
+            echo " Checking TestRigor retest"
+            echo "==================================="
+            response=$(curl -i -o - -s -X GET 'https://api.testrigor.com/api/v1/apps/joYxqWB3qEqwRtpTt/status' -H 'auth-token: 53fd83f4-d9f4-44f9-b8a8-490e86934ac5' -H 'Accept: application/json')
+            code=$(echo "$response" | grep HTTP | awk '{print $2}')
+            body=$(echo "$response" | sed -n '/{/,/}/p')
+            echo "Status code: " $code
+            echo "Response: " $body
+            case $code in
+              4*|5*) # 400 or 500 errors
+                echo "Error calling API"
+                exit 1
+                ;;
+              200) # 200: successfully finished
+                echo "Test finished successfully"
+                break
+                ;;
+              227|228) # 227: New - 228: In progress
+                echo "Test is not finished yet"
+                ;;
+              230) # 230: Failed
+                echo "Test finished but failed"
+                exit 1
+                ;;
+              *) # Any other status code
+                echo "Unknown status"
+                exit 1
+                ;;
+            esac
+            sleep 10
+          done
